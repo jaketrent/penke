@@ -1,0 +1,110 @@
+<html>
+
+<head>
+  <title>
+    Penke. The Scripture Memorization Game
+  </title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #8cede8;
+      font-family: sans-serif;
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    p {
+      font-size: 0.5em;
+      color: #111111;
+    }
+
+    blockquote {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+
+    }
+
+    button {
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: inherit;
+      cursor: pointer;
+      position: relative;
+    }
+
+    button:hover,
+    button:focus {
+      color: #fff;
+    }
+
+    button:hover:before,
+    button:focus:before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      background: #106b6e;
+      z-index: -1;
+      border-radius: 4px;
+    }
+
+    button:focus {
+      outline: none;
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1>
+    Penke
+  </h1>
+  <p>
+    Instructions: Click every word you know, and it will disappear. Once you click every word so that you can repeat the
+    scripture without seeing any hints, you win!
+  </p>
+  <blockquote id="quote" cite="https://www.churchofjesuschrist.org/study/scriptures/dc-testament/dc/10?lang=eng">
+    Loading...
+  </blockquote>
+  <script>
+
+    function handleWordClick(evt) {
+      if (evt.target.tagName !== 'BUTTON') return
+
+      const word = evt.target.textContent
+
+      const underline = Array.from({length: word.length - 1}).reduce((acc, _char) => acc + '_', '')
+
+      evt.target.innerHTML = underline
+    }
+
+
+    ; (function main() {
+      const el = document.querySelector('#quote')
+      el.innerHTML = ''
+
+      const scripture = 'Pray always, that you may come off conqueror; yea, that you may conquer Satan, and that you may escape the hands of the servants of Satan that do uphold his work.'
+
+      const words = scripture.split(' ')
+
+      const fragment = document.createDocumentFragment()
+
+      words.forEach((word, i) => {
+        const button = document.createElement('button')
+        button.textContent = word
+        // button.dataset.index = i
+        fragment.appendChild(button)
+      })
+
+      el.appendChild(fragment)
+
+      el.addEventListener('click', handleWordClick)
+    })()
+  </script>
+</body>
+
+</html>
