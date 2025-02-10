@@ -28,7 +28,7 @@
 
     }
 
-    button {
+    blockquote button {
       border: none;
       background: none;
       padding: 0;
@@ -37,13 +37,13 @@
       position: relative;
     }
 
-    button:hover,
-    button:focus {
+    blockquote button:hover,
+    blockquote button:focus {
       color: #fff;
     }
 
-    button:hover:before,
-    button:focus:before {
+    blockquote button:hover:before,
+    blockquote button:focus:before {
       content: '';
       position: absolute;
       inset: -4px;
@@ -52,8 +52,25 @@
       border-radius: 4px;
     }
 
-    button:focus {
+    blockquote button:focus {
       outline: none;
+    }
+
+    form {
+      display: none;
+    }
+
+    form.active {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 2rem 0;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
     }
   </style>
 
@@ -70,9 +87,17 @@
   <blockquote id="quote" cite="https://www.churchofjesuschrist.org/study/scriptures/dc-testament/dc/10?lang=eng">
     Loading...
   </blockquote>
+  <form id="assess">
+    <textarea name="rewrite" placeholder="Assessment: re-write the scripture"></textarea>
+    <button>
+      Submit
+    </button>
+  </form>
   <script>
 
-    function handleWordClick(evt) {
+    let clicks = 0
+
+    function handleWordClick(assess, evt) {
       if (evt.target.tagName !== 'BUTTON') return
 
       const word = evt.target.textContent
@@ -80,14 +105,38 @@
       const underline = Array.from({length: word.length - 1}).reduce((acc, _char) => acc + '_', '')
 
       evt.target.innerHTML = underline
+
+      assess(++clicks)
+    }
+
+
+    function assess(scriptureLength, clicks) {
+      if (clicks === scriptureLength) {
+        // show a text field, make them type the scripture, and if it matches, assess
+        const el = document.querySelector('#assess').classList.add('active')
+
+      }
+    }
+
+    function handleAssessSubmit(scripture, evt) {
+      evt.preventDefault()
+      const form = new FormData(evt.target)
+      const rewrite = form.get('rewrite')
+
+      if (rewrite === scripture) {
+        alert('You win!')
+      } else {
+        alert('Sorry, try again.')
+      }
     }
 
 
     ; (function main() {
-      const el = document.querySelector('#quote')
-      el.innerHTML = ''
+      const quoteEl = document.querySelector('#quote')
+      quoteEl.innerHTML = ''
 
-      const scripture = 'Pray always, that you may come off conqueror; yea, that you may conquer Satan, and that you may escape the hands of the servants of Satan that do uphold his work.'
+      // const scripture = 'Pray always, that you may come off conqueror; yea, that you may conquer Satan, and that you may escape the hands of the servants of Satan that do uphold his work.'
+      const scripture = 'Jesus wept.'
 
       const words = scripture.split(' ')
 
@@ -96,13 +145,15 @@
       words.forEach((word, i) => {
         const button = document.createElement('button')
         button.textContent = word
-        // button.dataset.index = i
         fragment.appendChild(button)
       })
 
-      el.appendChild(fragment)
+      quoteEl.appendChild(fragment)
 
-      el.addEventListener('click', handleWordClick)
+      quoteEl.addEventListener('click', handleWordClick.bind(this, assess.bind(this, words.length)))
+
+      const formEl = document.querySelector('#assess')
+      formEl.addEventListener('submit', handleAssessSubmit.bind(this, scripture))
     })()
   </script>
 </body>
