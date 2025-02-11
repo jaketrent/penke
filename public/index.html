@@ -113,15 +113,16 @@
     function handleWordClick(assess, evt) {
       if (evt.target.tagName !== 'BUTTON') return
 
-      const word = evt.target.textContent
+      const btn = evt.target
+      if (btn.dataset.clicked) return
 
+      btn.dataset.clicked = true
+      const word = btn.textContent
       const underline = Array.from({length: word.length - 1}).reduce((acc, _char) => acc + '_', '')
-
       evt.target.innerHTML = underline
 
       assess(++clicks)
     }
-
 
     function assess(scriptureLength, clicks) {
       if (clicks === scriptureLength) {
@@ -142,7 +143,6 @@
         alert('Sorry, try again.')
       }
     }
-
 
     ; (function main() {
       const quoteEl = document.querySelector('#quote')
