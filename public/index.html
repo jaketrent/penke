@@ -108,49 +108,57 @@
   </main>
   <script>
 
-    let clicks = 0
 
-    function handleWordClick(assess, evt) {
-      if (evt.target.tagName !== 'BUTTON') return
+    function initScripture(scriptures, i) {
+      const scripture = scriptures[i]
+      let clicks = 0
 
-      const btn = evt.target
-      if (btn.dataset.clicked) return
+      function handleWordClick(assess, evt) {
+        if (evt.target.tagName !== 'BUTTON') return
 
-      btn.dataset.clicked = true
-      const word = btn.textContent
-      const underline = Array.from({length: word.length - 1}).reduce((acc, _char) => acc + '_', '')
-      evt.target.innerHTML = underline
+        const btn = evt.target
+        if (btn.dataset.clicked) return
 
-      assess(++clicks)
-    }
+        btn.dataset.clicked = true
+        const word = btn.textContent
+        const underline = Array.from({length: word.length - 1}).reduce((acc, _char) => acc + '_', '')
+        evt.target.innerHTML = underline
 
-    function assess(scriptureLength, clicks) {
-      if (clicks === scriptureLength) {
-        // show a text field, make them type the scripture, and if it matches, assess
-        const el = document.querySelector('#assess').classList.add('active')
-
+        assess(++clicks)
       }
-    }
 
-    function handleAssessSubmit(scripture, evt) {
-      evt.preventDefault()
-      const form = new FormData(evt.target)
-      const rewrite = form.get('rewrite')
+      function assess(scriptureLength, clicks) {
+        if (clicks === scriptureLength) {
+          // show a text field, make them type the scripture, and if it matches, assess
+          const el = document.querySelector('#assess').classList.add('active')
 
-      if (rewrite === scripture) {
-        alert('You win!')
-      } else {
-        alert('Sorry, try again.')
+        }
       }
-    }
 
-    ; (function main() {
+      function handleAssessSubmit(scripture, evt) {
+        evt.preventDefault()
+        const form = new FormData(evt.target)
+        const rewrite = form.get('rewrite')
+
+        if (rewrite === scripture.text) {
+          alert('You win!')
+          next()
+        } else {
+          alert('Sorry, try again.')
+        }
+      }
+
+      function next() {
+        quoteEl.removeEventListener('click', quoteClickHandler)
+        formEl.removeEventListener('submit', formSubmitHandler)
+        const nextI = scriptures.length - 1 === i ? 0 : i + 1
+        initScripture(scriptures, nextI)
+      }
+
       const quoteEl = document.querySelector('#quote')
       quoteEl.innerHTML = ''
 
-      const scripture = 'Pray always, that you may come off conqueror; yea, that you may conquer Satan, and that you may escape the hands of the servants of Satan that do uphold his work.'
-
-      const words = scripture.split(' ')
+      const words = scripture.text.split(' ')
 
       const fragment = document.createDocumentFragment()
 
@@ -162,10 +170,26 @@
 
       quoteEl.appendChild(fragment)
 
-      quoteEl.addEventListener('click', handleWordClick.bind(this, assess.bind(this, words.length)))
+      const quoteClickHandler = handleWordClick.bind(this, assess.bind(this, words.length))
+      quoteEl.addEventListener('click', quoteClickHandler)
 
       const formEl = document.querySelector('#assess')
-      formEl.addEventListener('submit', handleAssessSubmit.bind(this, scripture))
+      formEl.querySelector('textarea').value = ''
+      formEl.classList.remove('active')
+      const formSubmitHandler = handleAssessSubmit.bind(this, scripture)
+      formEl.addEventListener('submit', formSubmitHandler)
+    }
+
+    ; (function main() {
+
+      const scriptures = [
+        // {title: 'D&C 10:5', text: 'Pray always'},
+        // {title: 'D&C 6:36', text: 'Look unto me'}
+        {title: 'D&C 10:5', text: 'Pray always, that you may come off conqueror; yea, that you may conquer Satan, and that you may escape the hands of the servants of Satan that do uphold his work.'},
+        {title: 'D&C 6:36', text: 'Look unto me in every thought; doubt not, fear not.'}
+      ]
+
+      initScripture(scriptures, 0)
     })()
   </script>
 </body>
